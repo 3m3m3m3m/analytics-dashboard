@@ -185,14 +185,17 @@ def normalize_platform(platform_str):
 
 
 def get_platform_expression(provider):
-    """Get SQL expression for platform based on provider type"""
+    """Get SQL expression for platform based on provider type.
+
+    Note: Uses %% to escape % for psycopg2 when query has parameter placeholders.
+    """
     if provider in ('thorchain', 'mayachain'):
         return "COALESCE(platform, raw_data->'metadata'->'swap'->>'affiliateAddress', 'Unknown')"
     elif provider == 'lifi':
         return """
             CASE
-                WHEN LOWER(COALESCE(platform, raw_data->'metadata'->>'integrator', 'Unknown')) LIKE '%android%' THEN 'Android'
-                WHEN LOWER(COALESCE(platform, raw_data->'metadata'->>'integrator', 'Unknown')) LIKE '%ios%' THEN 'iOS'
+                WHEN LOWER(COALESCE(platform, raw_data->'metadata'->>'integrator', 'Unknown')) LIKE '%%android%%' THEN 'Android'
+                WHEN LOWER(COALESCE(platform, raw_data->'metadata'->>'integrator', 'Unknown')) LIKE '%%ios%%' THEN 'iOS'
                 ELSE COALESCE(platform, raw_data->'metadata'->>'integrator', 'Unknown')
             END
         """
@@ -280,6 +283,21 @@ def safe_int(value, default=0):
         return int(value) if value is not None else default
     except (ValueError, TypeError):
         return default
+
+
+def get_sort_key_for_timestamp(row, field='time_period'):
+    """Get a timezone-naive datetime for sorting mixed timezone-aware and naive datetimes.
+
+    This handles the case where swaps table has timestamp with time zone but
+    dex_aggregator_revenue has timestamp without time zone.
+    """
+    tp = row.get(field)
+    if tp is None:
+        return datetime.min
+    # Convert timezone-aware to naive for comparison
+    if hasattr(tp, 'tzinfo') and tp.tzinfo is not None:
+        return tp.replace(tzinfo=None)
+    return tp
 
 
 # =============================================================================
@@ -1427,7 +1445,7 @@ def get_swap_volume():
 
         volume_over_time = sorted(
             list(swaps_time) + list(arkham_time),
-            key=lambda x: x['time_period'] if x['time_period'] else datetime.min
+            key=get_sort_key_for_timestamp
         )
 
         # 3. Total Volume by Provider
