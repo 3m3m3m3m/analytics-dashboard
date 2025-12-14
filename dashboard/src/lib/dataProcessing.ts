@@ -137,10 +137,11 @@ export function aggregateByGranularity(
 
     switch (granularity) {
       case 'h':
-        // Format: "Dec 10 14" (Month Day Hour)
+        // Format: "Dec 10, 2024 14" (Month Day, Year Hour)
         bucketKey = date.toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
+          year: 'numeric',
           hour: '2-digit',
           hour12: false,
         }).replace(',', '');
@@ -149,16 +150,16 @@ export function aggregateByGranularity(
         // Get week start (Sunday)
         const weekStart = new Date(date);
         weekStart.setDate(date.getDate() - date.getDay());
-        bucketKey = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        bucketKey = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         break;
       case 'm':
-        // Format: "2024 Jan"
-        bucketKey = date.toLocaleString('en-US', { year: 'numeric', month: 'short' });
+        // Format: "Jan 2024"
+        bucketKey = date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
         break;
       case 'd':
       default:
-        // Format: "Dec 10"
-        bucketKey = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        // Format: "Dec 10, 2024"
+        bucketKey = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         break;
     }
 

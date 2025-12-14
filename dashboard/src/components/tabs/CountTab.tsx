@@ -256,7 +256,7 @@ export function CountTab({ range, startDate, endDate, granularity }: CountTabPro
         const platformByDate: Record<string, any> = {};
 
         allData.countByPlatformOverTime.forEach((row: any) => {
-            const date = new Date(row.time_period);
+            const date = new Date(row.date);
             let dateStr: string;
 
             if (granularity === 'h') {

@@ -1593,7 +1593,7 @@ def get_swap_volume():
             'globalStats': global_stats,
             'volumeOverTime': [
                 {
-                    'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                    'date': r['time_period'].isoformat() if r['time_period'] else None,
                     'source': r['source'],
                     'volume': safe_float(r['volume'])
                 }
@@ -1601,7 +1601,7 @@ def get_swap_volume():
             ],
             'volumeByPlatformOverTime': [
                 {
-                    'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                    'date': r['time_period'].isoformat() if r['time_period'] else None,
                     'platform': r['platform'],
                     'volume': safe_float(r['volume'])
                 }
@@ -1690,14 +1690,14 @@ def get_swap_volume_by_provider(provider):
                 'provider': '1inch',
                 'totalVolume': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'volume': safe_float(r['volume'])
                     }
                     for r in time_series
                 ],
                 'platformBreakdown': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'chain': r['chain'],
                         'volume': safe_float(r['volume'])
                     }
@@ -1738,14 +1738,14 @@ def get_swap_volume_by_provider(provider):
                 'provider': provider,
                 'totalVolume': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'volume': safe_float(r['volume'])
                     }
                     for r in time_series
                 ],
                 'platformBreakdown': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'platform': r['platform'],
                         'volume': safe_float(r['volume'])
                     }
@@ -1965,7 +1965,7 @@ def get_swap_count():
             ],
             'countByPlatformOverTime': [
                 {
-                    'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                    'date': r['time_period'].isoformat() if r['time_period'] else None,
                     'platform': r['platform'],
                     'count': safe_int(r['count'])
                 }
@@ -2042,14 +2042,14 @@ def get_swap_count_by_provider(provider):
                 'provider': '1inch',
                 'totalCount': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'count': safe_int(r['count'])
                     }
                     for r in time_series
                 ],
                 'platformBreakdown': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'chain': r['chain'],
                         'count': safe_int(r['count'])
                     }
@@ -2090,14 +2090,14 @@ def get_swap_count_by_provider(provider):
                 'provider': provider,
                 'totalCount': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'count': safe_int(r['count'])
                     }
                     for r in time_series
                 ],
                 'platformBreakdown': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'platform': r['platform'],
                         'count': safe_int(r['count'])
                     }
@@ -2423,14 +2423,14 @@ def get_users_by_provider(provider):
                 'provider': '1inch',
                 'totalUsers': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'users': safe_int(r['users'])
                     }
                     for r in time_series
                 ],
                 'platformBreakdown': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'chain': r['chain'],
                         'users': safe_int(r['users'])
                     }
@@ -2471,14 +2471,14 @@ def get_users_by_provider(provider):
                 'provider': provider,
                 'totalUsers': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'users': safe_int(r['users'])
                     }
                     for r in time_series
                 ],
                 'platformBreakdown': [
                     {
-                        'time_period': r['time_period'].isoformat() if r['time_period'] else None,
+                        'date': r['time_period'].isoformat() if r['time_period'] else None,
                         'platform': r['platform'],
                         'users': safe_int(r['users'])
                     }

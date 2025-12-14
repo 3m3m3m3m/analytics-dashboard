@@ -103,7 +103,7 @@ export function SwapVolumeTab({ range, startDate, endDate, granularity }: SwapVo
     const rawChartData = useMemo(() => {
         if (!allData?.volumeOverTime) return [];
         return allData.volumeOverTime.map((item: any) => ({
-            date: item.time_period,
+            date: item.date,
             source: item.source,
             volume: Number(item.volume)
         }));
@@ -256,7 +256,7 @@ export function SwapVolumeTab({ range, startDate, endDate, granularity }: SwapVo
 
         const platformByDate: Record<string, any> = {};
         allData.volumeByPlatformOverTime.forEach((row: any) => {
-            const date = new Date(row.time_period);
+            const date = new Date(row.date);
             let dateStr: string;
             if (granularity === 'h') {
                 dateStr = date.toLocaleString('en-US', {
@@ -471,7 +471,7 @@ export function SwapVolumeTab({ range, startDate, endDate, granularity }: SwapVo
                                     {currentView === 'total' ? (() => {
                                         // Transform and filter total volume data
                                         const rawData = specificData?.totalVolume?.map((item: any) => ({
-                                            date: item.time_period,
+                                            date: item.date,
                                             source: provider,
                                             volume: Number(item.volume)
                                         })) || [];
@@ -508,7 +508,7 @@ export function SwapVolumeTab({ range, startDate, endDate, granularity }: SwapVo
                                     })() : (() => {
                                         // Transform and filter platform breakdown data
                                         const rawData = specificData?.platformBreakdown?.map((item: any) => ({
-                                            date: item.time_period,
+                                            date: item.date,
                                             source: item.platform || item.chain,
                                             volume: Number(item.volume)
                                         })) || [];
