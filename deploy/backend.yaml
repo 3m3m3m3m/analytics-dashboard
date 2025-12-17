@@ -74,6 +74,11 @@ spec:
                 secretKeyRef:
                   name: analytics-secrets
                   key: lifi-api-key
+            - name: MORALIS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: moralis-api-key
           resources:
             requests:
               memory: "128Mi"
