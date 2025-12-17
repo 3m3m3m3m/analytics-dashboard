@@ -17,9 +17,5 @@ RUN pip install --no-cache-dir -r requirements.txt \
 # Copy application code
 COPY . .
 
-# Create a non-root user
-RUN useradd -m -u 1000 syncuser && chown -R syncuser:syncuser /app
-USER syncuser
-
 # Run the continuous sync service
 CMD ["python", "main.py"]
