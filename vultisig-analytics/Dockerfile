@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir flask flask-cors
+    && pip install --no-cache-dir flask flask-cors gunicorn
 
 # Copy application code
 COPY . .
@@ -20,5 +20,5 @@ COPY . .
 # Expose API port
 EXPOSE 8080
 
-# Run the API server
-CMD ["python", "api_server.py"]
+# Run with gunicorn (production WSGI server)
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "4", "api_server:app"]

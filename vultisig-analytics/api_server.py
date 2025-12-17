@@ -2869,6 +2869,8 @@ def get_system_status():
 # =============================================================================
 
 if __name__ == '__main__':
+    import os
+    debug_mode = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
     logger.info("Starting VultisigAnalytics API server...")
     logger.info("Dashboard will be available at http://localhost:8080")
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=debug_mode)
