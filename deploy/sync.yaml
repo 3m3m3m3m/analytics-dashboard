@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync
+  labels:
+    app: sync
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sync
+  template:
+    metadata:
+      labels:
+        app: sync
+    spec:
+      imagePullSecrets:
+        - name: ghcr
+      containers:
+        - name: sync
+          image: busybox
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: database-url
+            - name: ONEINCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: oneinch-api-key
+            - name: ARKHAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: arkham-api-key
+            - name: ETHERSCAN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: etherscan-api-key
+            - name: INFURA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: infura-api-key
+            - name: ALCHEMY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: alchemy-api-key
+            - name: LIFI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: lifi-api-key
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
