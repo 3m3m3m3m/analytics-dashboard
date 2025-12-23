@@ -10,6 +10,7 @@ import { VolumeViewToggle } from '@/components/VolumeViewToggle';
 import { CumulativeToggle } from '@/components/CumulativeToggle';
 import { NewUsersToggle } from '@/components/NewUsersToggle';
 import { ChartViewToggle } from '@/components/ChartViewToggle';
+import { FeeTierSection } from '@/components/FeeTierSection';
 import { TrendingUp, Users, Wallet, Info } from 'lucide-react';
 import { providerColors, chainColorMap } from '@/lib/chartStyles';
 import { aggregateByGranularity, transformToChartData } from '@/lib/dataProcessing';
@@ -21,6 +22,17 @@ interface UsersTabProps {
     startDate?: string | null;
     endDate?: string | null;
     granularity: string;
+}
+
+interface FeeTierData {
+    tierDistribution: Array<{
+        tier: string;
+        userCount: number;
+        totalVolume: number;
+        avgVolumePerUser: number;
+    }>;
+    totalUsers: number;
+    totalVolume: number;
 }
 
 export function UsersTab({ range, startDate, endDate, granularity }: UsersTabProps) {
@@ -36,12 +48,15 @@ export function UsersTab({ range, startDate, endDate, granularity }: UsersTabPro
     const [providerNewUsersMode, setProviderNewUsersMode] = useState<Record<string, boolean>>({});
     const [chartView, setChartView] = useState<'provider' | 'platform'>('provider');
     const [visiblePlatforms, setVisiblePlatforms] = useState<string[]>(['Android', 'iOS', 'Web', 'Other']);
+    const [feeTierData, setFeeTierData] = useState<FeeTierData | null>(null);
+    const [feeTierError, setFeeTierError] = useState<string | null>(null);
 
     // Fetch all data in parallel when range, dates, or granularity changes
     useEffect(() => {
         async function fetchAllData() {
             setLoading(true);
             setError(null);
+            setFeeTierError(null);
 
             try {
                 // Build query parameters
@@ -57,9 +72,12 @@ export function UsersTab({ range, startDate, endDate, granularity }: UsersTabPro
                 // Define all known providers upfront
                 const allKnownProviders = ['thorchain', 'mayachain', 'lifi', '1inch'];
 
-                // Fetch main users data and all provider data in parallel
-                const [usersRes, ...providerResponses] = await Promise.all([
+                // Fetch main users data, all provider data, and fee tiers in parallel
+                const [usersRes, feeTiersRes, ...providerResponses] = await Promise.all([
                     fetch(buildApiUrl(`/api/users?${paramsString}`)),
+                    fetch(buildApiUrl(`/api/users/fee-tiers?${paramsString}`))
+                        .then(res => res.ok ? res.json() : null)
+                        .catch(() => null),
                     ...allKnownProviders.map(provider =>
                         fetch(buildApiUrl(`/api/users/provider/${provider}?${paramsString}`))
                             .then(res => res.ok ? res.json() : null)
@@ -71,6 +89,14 @@ export function UsersTab({ range, startDate, endDate, granularity }: UsersTabPro
 
                 const usersData = await usersRes.json();
                 setAllData(usersData);
+
+                // Set fee tier data
+                if (feeTiersRes) {
+                    setFeeTierData(feeTiersRes);
+                } else {
+                    setFeeTierData(null);
+                    setFeeTierError('Fee tier data not available');
+                }
 
                 // Process provider data
                 const newProviderData: Record<string, any> = {};
@@ -449,6 +475,13 @@ export function UsersTab({ range, startDate, endDate, granularity }: UsersTabPro
                     />
                 )}
             </div>
+
+            {/* Fee Tier Distribution Section */}
+            <FeeTierSection
+                data={feeTierData}
+                loading={loading}
+                error={feeTierError}
+            />
 
             {/* Provider Sections */}
             <div className="space-y-6">

@@ -80,6 +80,19 @@ export const fallbackChainColors = [
   '#3B82F6', // Blue
 ];
 
+// Fee tier colors (by tier name)
+export const tierColors: Record<string, string> = {
+  'Ultimate': '#FFD700',    // Gold
+  'Diamond': '#B9F2FF',     // Diamond blue
+  'Platinum': '#E5E4E2',    // Platinum silver
+  'Gold': '#FFA500',        // Orange gold
+  'Silver': '#C0C0C0',      // Silver
+  'Bronze': '#CD7F32',      // Bronze
+  'Standard': '#94A3B8',    // Slate gray
+  'Old Tiers': '#78716C',   // Stone gray (deprecated tiers)
+  'Unknown': '#6B7280'      // Gray (fallback)
+};
+
 // Glass tooltip style for charts
 export const glassTooltipStyle = {
   backgroundColor: 'rgba(15, 23, 42, 0.9)',
@@ -104,6 +117,19 @@ export function getProviderColor(name: string, index: number = 0): string {
   // Check chain map
   if (chainColorMap[lowerName]) {
     return chainColorMap[lowerName];
+  }
+
+  // Fallback to indexed color
+  return fallbackChainColors[index % fallbackChainColors.length];
+}
+
+/**
+ * Get color for a fee tier
+ */
+export function getTierColor(tier: string, index: number = 0): string {
+  // Check tier colors first
+  if (tierColors[tier]) {
+    return tierColors[tier];
   }
 
   // Fallback to indexed color
