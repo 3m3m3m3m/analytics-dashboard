@@ -218,6 +218,19 @@ export async function fetchUsersByProvider(provider: string, params: CommonQuery
 }
 
 /**
+ * Fetch fee tiers data
+ */
+export async function fetchFeeTiers(params: CommonQueryParams) {
+  const queryParams = buildQueryParams({
+    r: params.range,
+    g: params.granularity,
+    sd: params.startDate,
+    ed: params.endDate,
+  });
+  return fetchApi(`/api/users/fee-tiers?${queryParams.toString()}`);
+}
+
+/**
  * Fetch holders data
  */
 export async function fetchHolders() {

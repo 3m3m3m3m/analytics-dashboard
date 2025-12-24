@@ -2834,6 +2834,104 @@ def get_referrals():
 
 
 # =============================================================================
+# NEW ENDPOINTS - Fee Tier Distribution
+# =============================================================================
+
+@app.route('/api/users/fee-tiers')
+def get_fee_tier_distribution():
+    """Get fee tier distribution for users based on Vultisig affiliate fees"""
+    try:
+        range_param = get_param(request.args, 'RANGE') or 'all'
+        start_date_param = get_param(request.args, 'START_DATE')
+        end_date_param = get_param(request.args, 'END_DATE')
+
+        date_filter, _ = build_date_filter(range_param, start_date_param, end_date_param)
+
+        # Query to extract Vultisig fee and calculate tier distribution
+        fee_tier_query = f"""
+            WITH vultisig_fee_extraction AS (
+                SELECT
+                    user_address,
+                    in_amount_usd,
+                    COALESCE(
+                        CASE
+                            WHEN 'vi' = ANY(affiliate_addresses) THEN
+                                affiliate_fees_bps[array_position(affiliate_addresses, 'vi')]
+                            WHEN 'va' = ANY(affiliate_addresses) THEN
+                                affiliate_fees_bps[array_position(affiliate_addresses, 'va')]
+                            WHEN 'v0' = ANY(affiliate_addresses) THEN
+                                affiliate_fees_bps[array_position(affiliate_addresses, 'v0')]
+                            ELSE 0
+                        END,
+                        0
+                    ) as vultisig_fee_bps
+                FROM swaps
+                WHERE source IN ('thorchain', 'mayachain')
+                    AND affiliate_addresses IS NOT NULL
+                    AND affiliate_addresses && ARRAY['vi', 'va', 'v0']::text[]
+                    {date_filter}
+            )
+            SELECT
+                CASE
+                    WHEN vultisig_fee_bps = 0 THEN 'Ultimate'
+                    WHEN vultisig_fee_bps = 15 THEN 'Diamond'
+                    WHEN vultisig_fee_bps = 25 THEN 'Platinum'
+                    WHEN vultisig_fee_bps = 30 THEN 'Gold'
+                    WHEN vultisig_fee_bps = 40 THEN 'Silver'
+                    WHEN vultisig_fee_bps = 45 THEN 'Bronze'
+                    WHEN vultisig_fee_bps = 50 THEN 'Standard'
+                    ELSE 'Old Tiers'
+                END as tier,
+                COUNT(DISTINCT user_address) as user_count,
+                COALESCE(SUM(in_amount_usd), 0) as total_volume,
+                COALESCE(SUM(in_amount_usd) / NULLIF(COUNT(DISTINCT user_address), 0), 0) as avg_volume_per_user
+            FROM vultisig_fee_extraction
+            GROUP BY (CASE
+                    WHEN vultisig_fee_bps = 0 THEN 'Ultimate'
+                    WHEN vultisig_fee_bps = 15 THEN 'Diamond'
+                    WHEN vultisig_fee_bps = 25 THEN 'Platinum'
+                    WHEN vultisig_fee_bps = 30 THEN 'Gold'
+                    WHEN vultisig_fee_bps = 40 THEN 'Silver'
+                    WHEN vultisig_fee_bps = 45 THEN 'Bronze'
+                    WHEN vultisig_fee_bps = 50 THEN 'Standard'
+                    ELSE 'Old Tiers'
+                END)
+            ORDER BY 1
+        """
+
+        results = db_manager.execute_query(fee_tier_query, fetch=True)
+
+        # Calculate totals from results
+        total_users = 0
+        total_volume = 0.0
+        tier_distribution = []
+
+        for row in results:
+            user_count = safe_int(row['user_count'])
+            volume = safe_float(row['total_volume'])
+            total_users += user_count
+            total_volume += volume
+
+            tier_distribution.append({
+                'tier': row['tier'],
+                'userCount': user_count,
+                'totalVolume': volume,
+                'avgVolumePerUser': safe_float(row['avg_volume_per_user'])
+            })
+
+        return jsonify({
+            'tierDistribution': tier_distribution,
+            'totalUsers': total_users,
+            'totalVolume': total_volume
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting fee tier distribution: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+
+# =============================================================================
 # NEW ENDPOINTS - System Status
 # =============================================================================
 

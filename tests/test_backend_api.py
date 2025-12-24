@@ -285,6 +285,30 @@ class APITester:
             params={"r": "all", "g": "d"}
         )
 
+        # Test Fee Tiers Endpoint
+        print_header("Fee Tiers API Endpoints")
+        self.test_endpoint(
+            "Fee Tiers (All Time)",
+            "/api/users/fee-tiers",
+            expected_keys=["tierDistribution", "totalUsers", "totalVolume"],
+            expected_type=dict,
+            params={"r": "all", "g": "d"}
+        )
+        self.test_endpoint(
+            "Fee Tiers (7 Days)",
+            "/api/users/fee-tiers",
+            expected_keys=["tierDistribution", "totalUsers", "totalVolume"],
+            expected_type=dict,
+            params={"r": "7d", "g": "d"}
+        )
+        self.test_endpoint(
+            "Fee Tiers (30 Days)",
+            "/api/users/fee-tiers",
+            expected_keys=["tierDistribution", "totalUsers", "totalVolume"],
+            expected_type=dict,
+            params={"r": "30d", "g": "d"}
+        )
+
         # Test Holders Endpoints
         print_header("Holders API Endpoints")
         self.test_endpoint(
